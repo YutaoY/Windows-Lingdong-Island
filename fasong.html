@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>子止工坊—灵动岛客户端中枢</title>
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+			}
+
+			body {
+				width: 100%;
+				height: 100vh;
+				background-color: #f5f5f5;
+				overflow-x: hidden;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			#title {
+				width: 100%;
+				padding: 1em 0;
+				text-align: center;
+				margin-top: 1.1em;
+			}
+
+			.line {
+				width: 100%;
+				height: 60px;
+				background-color: white;
+				display: flex;
+				align-items: center;
+				margin: 10px 0;
+			}
+
+			.line h4 {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: black;
+				text-align: center;
+				cursor: pointer;
+			}
+
+			.line input[type="submit"] {
+				width: 100%;
+				height: 100%;
+				text-align: center;
+				font-weight: bold;
+				font-size: 1.1em;
+				color: #00aa66;
+				border: none;
+				background-color: white;
+			}
+
+			.left {
+				width: 22%;
+				margin-left: 5%;
+				color: black;
+				cursor: default;
+			}
+
+			.right {
+				width: 66%;
+				margin-left: 10%;
+				color: #999;
+			}
+
+			.right input[type="text"] {
+				width: 77%;
+				border: none;
+				border-bottom: 1px solid black;
+				background-color: transparent;
+			}
+
+			#img {
+				width: 100%;
+				height: auto;
+				display: flex;
+				justify-content: center;
+				padding: 10px 0;
+				margin-top: 10px;
+				background-color: white;
+				display: none;
+			}
+
+			#img img {
+				width: 77%;
+				height: auto;
+			}
+
+			#x_img {
+				width: 100%;
+				height: 60px;
+				background-color: white;
+				display: flex;
+				align-items: center;
+				display: none;
+			}
+
+			#x_img h4 {
+				width: 100%;
+				color: black;
+				text-align: center;
+				cursor: pointer;
+			}
+
+			iframe {
+				width: 50%;
+				height: 50%;
+				position: fixed;
+				left: 0;
+				top: 0;
+				z-index: 5;
+			}
+
+			#meng {
+				width: 100%;
+				height: 100vh;
+				position: fixed;
+				left: 0;
+				top: 0;
+				z-index: 100;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: rgba(0, 0, 0, 0.5);
+				visibility: hidden;
+			}
+
+			#meng_ban {
+				width: 77%;
+				padding: 1em 0;
+				border-radius: 33px;
+				text-align: center;
+				background-color: white;
+			}
+
+			input,
+			button {
+				outline: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="title">
+			<h4>灵动岛客户端中枢</h4>
+		</div>
+		<form action="sendData.php" method="post" enctype="multipart/form-data" target="form_IF">
+			<div class="line">
+				<span class="left">模式</span>
+				<span class="right" style="color: black">
+					<input type="radio" name="mode" value="0" checked onclick="txtMode()" />文本&nbsp;
+					&nbsp;&nbsp;<input type="radio" value="1" name="mode" onclick="imgMode()" />图片
+				</span>
+			</div>
+			<div class="line" id="user_box">
+				<span class="left">标题</span>
+				<span class="right">
+					<input type="text" name="username" id="username_input" autocomplete="off" />
+				</span>
+			</div>
+			<div class="line" id="text_box">
+				<span class="left">正文</span>
+				<span class="right">
+					<input type="text" name="usertext" id="usertext_input" autocomplete="off" />
+				</span>
+			</div>
+			<div class="line">
+				<span class="left">图片</span>
+				<span class="right">
+					<input type="text" name="fileimg" id="file_input" hidden />
+					<input type="file" id="file_this" onchange="img_file_choose(this)" />
+				</span>
+			</div>
+			<input type="submit" id="fasong_button" hidden />
+		</form>
+		<div id="img">
+			<img src="" alt="" id="img_src" />
+		</div>
+		<div id="x_img">
+			<h4 onclick="delete_img()">删除图片</h4>
+		</div>
+		<div class="line" style="margin-top: 2.5em">
+			<h4 style="color: #00aa66" onclick="fasong()">发送</h4>
+		</div>
+		<iframe name="form_IF" hidden></iframe>
+		<br /><br /><br />
+
+		<div id="meng">
+			<div id="meng_ban">
+				<h3 id="meng_text">发送中，请稍等...</h3>
+			</div>
+		</div>
+
+		<script src="jquery.min.js"></script>
+		<script>
+			window.onkeydown =
+				window.onkeyup =
+				window.onkeypress =
+					function () {
+						if (event.keyCode == 13) {
+							event.preventDefault();
+							window.event.returnValue = false;
+						}
+					};
+
+			function txtMode() {
+				document.getElementById("user_box").style.display = "flex";
+				document.getElementById("text_box").style.display = "flex";
+			}
+
+			function imgMode() {
+				var imgStr = document.getElementById("file_input").value;
+				if (new String(imgStr).length == 0) {
+					$("#file_this").click();
+				}
+				document.getElementById("user_box").style.display = "none";
+				document.getElementById("text_box").style.display = "none";
+			}
+
+			function img_file_choose(node) {
+				var fileOB = node.files[0];
+				var fileType = new String(fileOB.type).indexOf("image");
+				if (fileType != -1) {
+					var fi = new FileReader();
+					fi.readAsDataURL(fileOB);
+					fi.onload = function (e) {
+						var fImg = e.target.result;
+						document.getElementById("img_src").src = fImg;
+						document.getElementById("file_input").value = fImg;
+						document.getElementById("img").style.display = "flex";
+						document.getElementById("x_img").style.display = "flex";
+					};
+				} else {
+					alert("请选择图片类型");
+					document.getElementById("file_this").value = "";
+				}
+			}
+
+			function delete_img() {
+				document.getElementById("img_src").src = "";
+				document.getElementById("file_this").value = "";
+				document.getElementById("file_input").value = "";
+				document.getElementById("img").style.display = "none";
+				document.getElementById("x_img").style.display = "none";
+			}
+
+			var setval;
+			var settime;
+
+			function fasong() {
+				document.getElementById("meng").style.visibility = "visible";
+				sessionStorage.removeItem("request");
+				$("#fasong_button").click();
+				setval = setInterval(() => {
+					if (sessionStorage.getItem("request") == "ok") {
+						clearTimeout(settime);
+						clearInterval(setval);
+						alert("发送成功");
+						location.reload(true);
+					}
+					if (sessionStorage.getItem("request") == "no") {
+						clearTimeout(settime);
+						clearInterval(setval);
+						alert("Error:发送失败！\n核心数据丢失！");
+						document.getElementById("meng").style.visibility = "hidden";
+					}
+					if (sessionStorage.getItem("request") == "err") {
+						clearTimeout(settime);
+						clearInterval(setval);
+						alert("Error:发送失败！\n服务器内部异常！");
+						document.getElementById("meng").style.visibility = "hidden";
+					}
+				}, 100);
+				settime = setTimeout(() => {
+					clearTimeout(settime);
+					alert("Error:发送失败！\n请求超时！");
+					document.getElementById("meng").style.visibility = "hidden";
+				}, 18000);
+			}
+		</script>
+	</body>
+</html>

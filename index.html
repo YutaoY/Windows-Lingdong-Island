@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>灵动岛</title>
+		<style>
+			@keyframes ipone_14_wx {
+				0% {
+					width: 0;
+					height: 0;
+					border-radius: 66px;
+					transform: scale(1, 1);
+				}
+
+				5% {
+					width: 100%;
+					height: 10vh;
+					transform: scale(1.1, 1.1);
+				}
+
+				7% {
+					transform: scale(1, 1);
+				}
+
+				90% {
+					width: 100%;
+					height: 10vh;
+					transform: scale(1, 1);
+				}
+
+				95% {
+					width: 0;
+					height: 0;
+					transform: scale(1, 1);
+				}
+
+				97% {
+					transform: scale(1.2, 1.2);
+				}
+
+				100% {
+					transform: scale(1, 1);
+					border-radius: 66px;
+				}
+			}
+
+			@keyframes ipone_14_img {
+				0% {
+					width: 0;
+					height: 0;
+					border-radius: 66px;
+					transform: scale(1, 1);
+				}
+
+				5% {
+					width: 100%;
+					height: 77vh;
+					transform: scale(1.1, 1.1);
+				}
+
+				7% {
+					transform: scale(1, 1);
+				}
+
+				90% {
+					width: 100%;
+					height: 77vh;
+					transform: scale(1, 1);
+				}
+
+				95% {
+					width: 0;
+					height: 0;
+					transform: scale(1, 1);
+				}
+
+				97% {
+					transform: scale(1.2, 1.2);
+				}
+
+				100% {
+					transform: scale(1, 1);
+					border-radius: 66px;
+				}
+			}
+
+			* {
+				padding: 0;
+				margin: 0;
+			}
+
+			body {
+				width: 100%;
+				height: 100vh;
+				background-color: transparent;
+			}
+
+			#main {
+				width: 100%;
+				height: auto;
+				display: flex;
+				justify-content: center;
+				position: fixed;
+				top: 5%;
+				left: 0;
+			}
+
+			#content {
+				max-width: 77vh;
+				padding: 1em 4.4em;
+				background-color: black;
+				color: white;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				border-radius: 60px;
+				cursor: pointer;
+				position: absolute;
+				top: 0;
+				overflow: hidden;
+			}
+
+			#content_add {
+				width: 100%;
+				height: 100%;
+				color: white;
+				display: flex;
+				align-items: center;
+			}
+
+			#wx_img {
+				width: 66px;
+				border-radius: 50%;
+				margin: 0 10px;
+				background-color: white;
+			}
+
+			#wx_name {
+				font-weight: bolder;
+				font-size: 1.1em;
+			}
+
+			#wx_text {
+				font-size: 1.44em;
+				margin: 5px 0;
+			}
+
+			#wx_time {
+				margin: 10px 0;
+				color: #999;
+				font-size: 0.88em;
+			}
+
+			#img_src {
+				width: 88%;
+				/* max-height: 95%; */
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body onload="start()">
+		<div id="main">
+			<div id="content"></div>
+		</div>
+
+		<script src="zizhi.min.js"></script>
+		<script>
+			var ID = 0;
+			var initialization = true;
+
+			function start() {
+				notice_fc("1", "", "", "img/logo.png", ""); //初始展示图
+				setInterval(() => {
+					returnData();
+				}, 2500); //信息接收定时器
+			}
+
+			function returnData() {
+				if (initialization == true) {
+					zz.request({ //子止工坊轻量御用组件，请求receiveData.php信息
+						url: "receiveData.php",
+						data: {
+							requestID: ID,
+						},
+						success: function (res) {
+							var data = res;
+							console.log(res);
+							if (data.RequestStatus == "success" && data.RequestData.id == ID) {
+								var data = JSON.parse(data.RequestData.data);
+								var text = data.text;
+								var mode = data.mode;
+								var user = data.user;
+								var img = data.img;
+								var time = data.time;
+								notice_fc(mode, user, text, img, time);
+							}
+						},
+					});
+				}
+			}
+
+			function notice_fc(mode, user, text, img, time) {
+				if (initialization == true) {
+					initialization = false;
+					ID += 1;
+					document.getElementById("content").innerHTML = "";
+					switch (mode) {
+						case "0":
+							document.getElementById("content").style.animation = "ipone_14_wx 10s";
+							setTimeout(() => {
+								wx_show_fc(user, text, img, time);
+							}, 100);
+							setTimeout(() => {
+								document.getElementById("content_add").remove();
+							}, 9100);
+							break;
+						case "1":
+							document.getElementById("content").style.animation = "ipone_14_img 10s";
+							setTimeout(() => {
+								img_show_fc(img);
+							}, 100);
+							setTimeout(() => {
+								document.getElementById("content_add").remove();
+							}, 9500);
+							break;
+						default:
+							break;
+					}
+					setTimeout(() => {
+						document.getElementById("content").style.animation = "";
+						initialization = true;
+					}, 10000);
+				}
+			}
+
+			function strSuo(str, nub) {
+				var txt = new String(str);
+				if (nub == undefined) {
+					nub = 10;
+				}
+				if (txt.length > nub) {
+					var slNub = Math.round(nub / 2) + Math.round(nub / 2 / 2);
+					var start = txt.slice(0, slNub);
+					var end = start + "...";
+					return end;
+				} else {
+					return txt;
+				}
+			}
+
+			function img_show_fc(src) {
+				var content_add = document.createElement("div");
+				var img_src = document.createElement("img");
+				content_add.id = "content_add";
+				content_add.style.justifyContent = "center";
+				img_src.id = "img_src";
+				img_src.src = src;
+				content_add.appendChild(img_src);
+				document.getElementById("content").appendChild(content_add);
+			}
+
+			function wx_show_fc(username, text, img, time) {
+				var content_add = document.createElement("div");
+				var wx_img = document.createElement("img");
+				var content = document.createElement("div");
+				var wx_name = document.createElement("p");
+				var wx_text = document.createElement("p");
+				var wx_time = document.createElement("p");
+				content_add.id = "content_add";
+				wx_img.id = "wx_img";
+				wx_name.id = "wx_name";
+				wx_text.id = "wx_text";
+				wx_time.id = "wx_time";
+				wx_img.src = "img/weixin_logo.jpg";
+				if (new String(img).length > 0) {
+					wx_img.src = img;
+				}
+				content.style.width = "auto";
+				content.style.height = "auto";
+				content.style.marginLeft = "1.44em";
+				wx_name.innerText = strSuo(username, 15);
+				wx_text.innerText = strSuo(text, 33);
+				wx_time.innerText = time;
+				content.appendChild(wx_name);
+				content.appendChild(wx_text);
+				content.appendChild(wx_time);
+				content_add.appendChild(wx_img);
+				content_add.appendChild(content);
+				document.getElementById("content").appendChild(content_add);
+			}
+		</script>
+	</body>
+</html>
